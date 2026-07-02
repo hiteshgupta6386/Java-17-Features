@@ -1,0 +1,145 @@
+Sealed Interface
+
+Definition : 
+  -> Introduced in Java 17.
+  -> A sealed interface restricts which classes or interfaces can implement or extend it.
+  -> Only explicitly permitted classes/interfaces are allowed.
+
+Syntax:
+public sealed interface Payment
+        permits UPI, CreditCard, Cash {
+}
+
+
+Why Sealed Interfaces?
+Normally, any class can implement an interface.
+
+interface Payment {}
+class UPI implements Payment {}
+class CreditCard implements Payment {}
+class Crypto implements Payment {}   // Allowed
+
+Suppose only UPI, CreditCard, and Cash should be valid payment methods.
+A normal interface cannot restrict implementations.
+
+Solution: Use a sealed interface.
+
+public sealed interface Payment
+        permits UPI, CreditCard, Cash {
+}
+
+Now only these classes can implement it.
+final class UPI implements Payment {}
+final class CreditCard implements Payment {}
+final class Cash implements Payment {}
+
+Attempting:
+class Crypto implements Payment {}
+
+Compilation Error: Class Crypto is not allowed in the sealed hierarchy.
+
+
+Rules:
+
+Rule 1) : Every permitted implementation must declare one modifier:
+        -> final
+        -> sealed
+        -> non-sealed
+
+Example
+final class Cash implements Payment {}
+
+Rule 2 ) Every permitted class must explicitly implement the interface.
+
+Incorrect:
+sealed interface Payment
+        permits Cash {}
+
+final class Cash {
+}
+
+Compilation Error
+
+Correct:
+
+final class Cash implements Payment {}
+
+Rule 3) Permitted classes/interfaces must belong to the same package/module as the sealed interface.
+
+Example
+
+payment
+    Payment
+
+payment2
+    UPI
+
+Compilation Error
+
+
+
+Three Possible Modifiers
+
+1. final
+Stops further inheritance.
+
+final class Cash implements Payment {}
+
+Cannot extend Cash.
+
+
+2. sealed
+
+Continue controlled hierarchy.
+
+sealed class CreditCard
+        implements Payment
+        permits VisaCard, MasterCard {
+}
+final class VisaCard extends CreditCard {}
+
+final class MasterCard extends CreditCard {}
+
+
+3. non-sealed: Removes restrictions.
+
+non-sealed class UPI
+        implements Payment {
+}
+
+
+Now anyone can extend UPI.
+
+class GooglePay extends UPI {}
+class PhonePe extends UPI {}
+class Paytm extends UPI {}
+
+
+Sealed Interface Hierarchy
+              Payment (sealed interface)
+            /          |            \
+           /           |             \
+     CreditCard      Cash         UPI
+       (sealed)      (final)   (non-sealed)
+           |
+   ------------------
+   |                |
+VisaCard       MasterCard
+  (final)         (final)
+
+UPI
+├── GooglePay
+├── PhonePe
+└── Paytm
+
+
+
+Sealed Interface vs Sealed Class
+
+| Feature               | Sealed Class        | Sealed Interface         |
+| --------------------- | ------------------- | ------------------------ |
+| Purpose               | Restrict subclasses | Restrict implementations |
+| Keyword               | extends             | implements               |
+| Can have constructors | Yes                 | No                       |
+| Multiple inheritance  | No                  | Yes (interfaces)         |
+
