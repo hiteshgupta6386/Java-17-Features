@@ -143,3 +143,13 @@ Sealed Interface vs Sealed Class
 | Can have constructors | Yes                 | No                       |
 | Multiple inheritance  | No                  | Yes (interfaces)         |
 
+
+
+
+Note: If the permitted type is an interface:
+      -> An interface cannot be final.
+
+It can only be:
+  1) sealed
+  2) non-sealed
+
