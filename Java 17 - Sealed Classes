@@ -1,0 +1,201 @@
+Java 17 - Sealed Classes
+
+Definition:
+  -> Introduced in Java 17.
+  -> Used to control inheritance.
+  -> Allows only specified classes/interfaces to extend or implement a class/interface.
+  -> Prevents unauthorized subclasses at compile time.
+
+Syntax:
+
+public sealed class Payment
+        permits UPI, Cash, CreditCard {
+}
+
+
+Why Sealed Classes?
+
+Problem without Sealed Classes
+
+Any class can extend a parent class.
+
+class Payment {}
+
+class UPI extends Payment {}
+class Cash extends Payment {}
+class CreditCard extends Payment {}
+class Crypto extends Payment {}    // Allowed (Not desired)
+
+Suppose only UPI, Cash, and CreditCard should be valid payment methods.
+
+Need controlled inheritance.
+
+
+
+Why not use final?
+public final class Payment {}
+
+Result:
+No class can extend Payment.
+ UPI
+ Cash
+ CreditCard
+ Crypto
+
+Issue:
+  -> Stops inheritance completely.
+  -> Cannot allow selected child classes.
+
+
+Why Package-Private Doesn't Help?
+
+Making Payment package-private:
+
+class Payment {}
+
+Effects:
+  -> Cannot extend outside package.
+  -> Cannot even access Payment outside package.
+
+This restricts access, not just inheritance.
+
+
+
+Solution - Sealed Class
+public sealed class Payment
+        permits UPI, Cash, CreditCard {
+}
+
+Only these classes can extend Payment.
+
+final class UPI extends Payment {}
+final class Cash extends Payment {}
+final class CreditCard extends Payment {}
+
+
+Attempting:
+
+class Crypto extends Payment {}
+
+Compilation Error: Crypto is not allowed in the sealed hierarchy.
+
+Rules of Sealed Classes: 
+  
+Rule 1) Every permitted subclass must declare one modifier:
+        -> final
+        -> sealed
+        -> non-sealed
+
+Otherwise compilation fails.
+
+All sealed class subclasses must either be
+final, sealed or non-sealed.
+
+
+Rule 2) Every permitted subclass must explicitly extend the sealed class.
+
+Example
+
+sealed class Payment
+        permits Cash {}
+
+final class Cash {
+}
+
+Compilation Error
+
+Because Cash is permitted but does not extend Payment.
+
+Correct:
+
+final class Cash extends Payment {}
+
+Rule 3) Permitted subclasses must belong to the same package/module as the sealed class.
+
+Example
+
+payment
+    Payment
+
+payment2
+    Cash
+
+Compilation Error:
+Class payment2.Cash from another package
+not allowed to extend sealed class Payment
+
+
+Three Possible Modifiers
+
+1. final
+Stops inheritance completely.
+
+final class CreditCard extends Payment {}
+
+Cannot extend further.
+
+class HDFCCreditCard extends CreditCard {}
+
+Compilation Error
+
+Use When : Hierarchy should end.
+
+
+2. sealed
+Continue controlled inheritance.
+
+sealed class CreditCard
+    extends Payment
+    permits AmexCard {
+}
+
+final class AmexCard extends CreditCard {}
+
+Only AmexCard is allowed.
+
+
+3. non-sealed : Removes restriction.
+
+non-sealed class UPI
+        extends Payment {
+}
+
+Now any class can extend UPI.
+
+class GPay extends UPI {}
+class PhonePe extends UPI {}
+class Paytm extends UPI {}
+
+Unlimited inheritance.
+
+
+
+Hierarchy Example
+                 Payment (sealed)
+              /        |         \
+             /         |          \
+      CreditCard    Cash      UPI
+        (sealed)    (final)  (non-sealed)
+            |
+        AmexCard(final)
+
+UPI
+ ├── GPay
+ ├── PhonePe
+ └── Paytm
+
+
+
+When to use Each Modifier:
+
+1) final
+    -> No further inheritance.
+    -> End of hierarchy.
+
+2) sealed
+    -> Continue controlled inheritance.
+    -> Only selected subclasses allowed.
+
+3) non-sealed
+    -> Open inheritance.
+    -> Anyone can extend.
