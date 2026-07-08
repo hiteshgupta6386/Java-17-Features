@@ -1,0 +1,146 @@
+What are Record Classes?
+
+Record classes are a special kind of class introduced to model immutable data objects with significantly less boilerplate code.
+
+Instead of manually writing:
+Fields
+Constructor
+Getter methods
+equals()
+hashCode()
+toString()
+
+Java generates them automatically.
+
+
+Why Use Records?
+Traditional Java classes require a lot of repetitive code for simple data objects.
+
+Example:
+
+public class Rectangle {
+
+    private final double length;
+    private final double width;
+
+    public Rectangle(double length, double width) {
+        this.length = length;
+        this.width = width;
+    }
+
+    public double length() {
+        return length;
+    }
+
+    public double width() {
+        return width;
+    }
+
+    @Override
+    public boolean equals(Object obj) { ... }
+
+    @Override
+    public int hashCode() { ... }
+
+    @Override
+    public String toString() { ... }
+}
+
+With Records:
+
+record Rectangle(double length, double width) {}
+
+
+
+Syntax
+record RecordName(Type field1, Type field2) {
+}
+
+Example
+record Rectangle(double length, double width) {}
+
+Creating a Record Object
+Records are instantiated just like normal classes.
+Rectangle rectangle = new Rectangle(4.0, 5.0);
+
+
+
+Members Automatically Generated : 
+
+For
+record Rectangle(double length, double width) {}
+
+Java automatically creates:
+
+1) Private Final Fields :
+
+private final double length;
+private final double width;
+
+Fields are:
+private
+final
+
+which makes records immutable.
+
+2) Public Accessor Methods
+
+Instead of getters:
+
+rectangle.length();
+rectangle.width();
+
+Not
+
+rectangle.getLength();
+rectangle.getWidth();
+
+
+3) Canonical Constructor
+
+Automatically generated constructor
+
+Rectangle rectangle = new Rectangle(4, 5);
+
+Equivalent to
+
+public Rectangle(double length, double width) {
+    this.length = length;
+    this.width = width;
+}
+
+4) equals()
+
+Two record objects are equal if:
+
+They are of the same type.
+Their component values are equal.
+
+Example
+
+Rectangle r1 = new Rectangle(4,5);
+Rectangle r2 = new Rectangle(4,5);
+
+System.out.println(r1.equals(r2));
+
+Output
+
+true
+
+5) hashCode()
+
+Automatically generated based on record components.
+
+System.out.println(r1.hashCode());
+System.out.println(r2.hashCode());
+
+Equal records produce identical hash codes.
+
+6) toString()
+
+Automatically generated.
+
+System.out.println(r1);
+
+Output:
+Rectangle[length=4.0, width=5.0]
